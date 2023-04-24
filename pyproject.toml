@@ -8,6 +8,8 @@ packages = [{include = "bitcoin_forecast_automation"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+pandas = "^2.0.1"
+cryptocmd = "^0.6.1"
 
 
 [build-system]

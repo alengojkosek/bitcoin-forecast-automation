@@ -10,6 +10,7 @@ packages = [{include = "bitcoin_forecast_automation"}]
 python = "^3.9"
 pandas = "^2.0.1"
 cryptocmd = "^0.6.1"
+dvc = "^2.55.0"
 
 
 [build-system]

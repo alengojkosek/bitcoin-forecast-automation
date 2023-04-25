@@ -37,7 +37,7 @@ jobs:
         run: git config --global user.email "alen.gojkosek@student.um.si" && git config --global user.name "alengojkosek"
         
       - name: Git global
-        run: dvc config core.autostage true
+        run: poetry run dvc config core.autostage true
 
       - name: Commit data
         run: |

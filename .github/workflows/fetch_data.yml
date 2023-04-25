@@ -3,7 +3,7 @@ on:
   push:
 
 jobs:
-  fetch_air_data:
+  fetch_btc_data:
     runs-on: ubuntu-latest
 
     outputs:
@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
 
-      - name: fetch_air_data
+      - name: fetch_btc_data
         run: poetry run python src/data/fetch_data.py
 
       - name: Git global
@@ -38,8 +38,8 @@ jobs:
 
       - name: Commit data
         run: |
-          poetry run dvc add data/raw/raw_data.csv
           git add data/raw/raw_data.csv.dvc .gitignore && git commit -m'Add new raw dataset'
+          poetry run dvc add data/raw/raw_data.csv
 
       - name: Push data dvc
         run: poetry run dvc push -r origin

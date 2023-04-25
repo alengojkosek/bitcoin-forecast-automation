@@ -6,4 +6,4 @@ scraper = CmcScraper("BTC")
 
 df = scraper.get_dataframe()
 
-df.to_csv('data/raw/raw_data.csv', index=False)
+df.to_csv('raw_data.csv', index=False)

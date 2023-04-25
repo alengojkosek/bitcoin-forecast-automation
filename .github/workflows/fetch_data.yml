@@ -43,18 +43,6 @@ jobs:
         run: |
             git add raw_data.csv.dvc && git commit -m'Add new raw dataset'
             poetry run dvc add raw_data.csv
-            poetry run dvc move raw_data.csv data/raw/ --to-cloud
-      
-      - name: Push changes git
-        uses: ad-m/github-push-action@master
-        with:
-           github_token: ${{ secrets.TOKEN }}
-           branch: ${{ github.ref }}
-    
-      - name: Commit moved file
-        run: |
-            git add data/raw/raw_data.csv.dvc && git commit -m'Move raw data to data/raw'
-
             
       - name: Push data dvc
         run: poetry run dvc push -r origin

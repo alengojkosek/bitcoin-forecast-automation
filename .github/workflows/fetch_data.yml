@@ -41,8 +41,9 @@ jobs:
 
       - name: Commit data
         run: |
-            git add raw_data.csv.dvc && git commit -m'Add new raw dataset'
+            cd raw/data
             poetry run dvc add raw_data.csv
+            git add raw_data.csv.dvc && git commit -m'Add new raw dataset'
             
       - name: Push data dvc
         run: poetry run dvc push -r origin

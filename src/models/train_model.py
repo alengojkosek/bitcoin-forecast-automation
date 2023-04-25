@@ -8,7 +8,7 @@ import numpy as np
 import os
 
 
-MLFLOW_TRACKING_URI=https://dagshub.com/alengojkosek/bitcoin-forecast-automation.mlflow
+MLFLOW_TRACKING_URI='https://dagshub.com/alengojkosek/bitcoin-forecast-automation.mlflow'
 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 os.environ['MLFLOW_TRACKING_USERNAME'] = 'alengojkosek'
 os.environ['MLFLOW_TRACKING_PASSWORD'] = 'af9dc140062b507e1c608237487e976c3d8e7d78'
@@ -24,7 +24,7 @@ mlflow.autolog(exclusive=False)
 
 with mlflow.start_run():
     # Load the dataset
-    df = pd.read_csv('raw_data.csv')
+    df = pd.read_csv('data/raw/raw_data.csv')
     df= df.drop('Date', axis=1)
     x = df.drop('Close', axis=1)
     y = df['Close']

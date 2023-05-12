@@ -24,7 +24,7 @@ mlflow.autolog(exclusive=False)
 
 with mlflow.start_run():
 
-    df = pd.read_csv('raw_data.csv')
+    df = pd.read_csv('data/raw/raw_data.csv')
     df['Date'] = pd.to_datetime(df['Date'])
 
     # Get the last date from the DataFrame

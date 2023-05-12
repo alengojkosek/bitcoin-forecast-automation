@@ -52,7 +52,7 @@ with mlflow.start_run():
     future_df['Close'] = future_df['Close'].astype(float)
 
     # Save the future DataFrame to a new CSV file without the index column
-    future_df.to_csv('future_data.csv', index=False)
+    future_df.to_csv('data/predictions/future_data.csv', index=False)
 
     # Split the data into training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)

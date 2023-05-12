@@ -1,11 +1,11 @@
 from sklearn.metrics import mean_squared_error, mean_absolute_error
-import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-import pickle
 import mlflow
-import numpy as np
 import os
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from datetime import timedelta, datetime
 
 
 MLFLOW_TRACKING_URI='https://dagshub.com/alengojkosek/bitcoin-forecast-automation.mlflow'
@@ -23,50 +23,57 @@ print("Lifecycle_stage: {}".format(experiment.lifecycle_stage))
 mlflow.autolog(exclusive=False)
 
 with mlflow.start_run():
-    # Load the dataset
-    df = pd.read_csv('data/raw/raw_data.csv')
-    df= df.drop('Date', axis=1)
-    x = df.drop('Close', axis=1)
+
+    df = pd.read_csv('raw_data.csv')
+    df['Date'] = pd.to_datetime(df['Date'])
+
+    # Get the last date from the DataFrame
+    last_date = df['Date'].max()
+
+    # Generate 7 future dates starting from the day after the last date
+    future_dates = pd.date_range(last_date + timedelta(days=1), periods=7, freq='D')
+
+    # Create a new DataFrame with the future dates
+    future_df = pd.DataFrame({'Date': future_dates})
+
+    # Convert the future dates to timestamps and predict the Close values using Linear Regression
+    X = df[['Date']].astype(np.int64) // 10**9
     y = df['Close']
+    lr = LinearRegression().fit(X, y)
 
-    # Split the dataset into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=42)
+    # Reshape the future dates array to a 2D array with a single feature
+    future_dates_2d = future_df['Date'].astype(np.int64) // 10**9
+    future_dates_2d = future_dates_2d.values.reshape(-1, 1)
 
-    model = LinearRegression()
+    # Predict the Close values for the future dates
+    future_df['Close'] = lr.predict(future_dates_2d)
 
-    model.fit(X_train, y_train)
+    # Convert the predicted Close values back to floats
+    future_df['Close'] = future_df['Close'].astype(float)
 
-    # Use the model to make predictions on the training data
-    y_pred_train = model.predict(X_train)
+    # Save the future DataFrame to a new CSV file without the index column
+    future_df.to_csv('future_data.csv', index=False)
 
-    # Evaluate the performance of the model on the training data
-    train_score = model.score(X_train, y_train)
-    print(f"Training R-squared score: {train_score:.2f}")
+    # Split the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
-    # Calculate mean squared error (MSE) on the testing data
-    mse = mean_squared_error(y_train, y_pred_train)
-    print(f"Training MSE: {mse:.2f}")
+    # Fit a linear regression model to the training data
+    lr = LinearRegression().fit(X_train, y_train)
 
-    # Calculate mean absolute error (MAE) on the testing data
-    mae = mean_absolute_error(y_train, y_pred_train)
-    print(f"Training MAE: {mae:.2f}")
+    # Predict the Close values for the test data
+    y_pred = lr.predict(X_test)
 
-    # Use the model to make predictions on the testing data
-    y_pred_test = model.predict(X_test)
+    # Calculate the evaluation metrics
+    mae = mean_absolute_error(y_test, y_pred)
+    mse = mean_squared_error(y_test, y_pred)
+    r2 = r2_score(y_test, y_pred)
 
-    # Evaluate the performance of the model on the testing data
-    test_score = model.score(X_test, y_test)
-    print(f"Testing R-squared score: {test_score:.2f}")
+    print("MAE:", mae)
+    print("MSE:", mse)
+    print("R2 Score:", r2)
 
-    # Calculate mean squared error (MSE) on the testing data
-    mse = mean_squared_error(y_test, y_pred_test)
-    print(f"Testing MSE: {mse:.2f}")
-
-    # Calculate mean absolute error (MAE) on the testing data
-    mae = mean_absolute_error(y_test, y_pred_test)
-    print(f"Testing MAE: {mae:.2f}")
 
     mlflow.log_metric("MAE", mae)
     mlflow.log_metric("MSE", mse)
-    mlflow.log_metric("Train score", train_score)
+    mlflow.log_metric("R2 score", r2)
 mlflow.end_run()

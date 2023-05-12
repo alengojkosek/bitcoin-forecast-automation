@@ -57,3 +57,4 @@ jobs:
         id: sha_new
         run: echo "SHA_NEW=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
+test

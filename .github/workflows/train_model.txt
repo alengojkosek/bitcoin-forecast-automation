@@ -1,21 +1,17 @@
-name: Fetch Data Pipeline
+name: MLFlow Pipeline
 on:
   push:
 
 jobs:
-  fetch_btc_data:
+  mlflow:
     runs-on: ubuntu-latest
-
     outputs:
       sha_new: ${{steps.sha_new.outputs.SHA_NEW}}
-
     permissions:
       contents: write
-
     strategy:
       matrix:
         python-version: [ "3.9" ]
-
     steps:
       - uses: actions/checkout@v3
         with:
@@ -30,21 +26,24 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
 
-      - name: fetch_btc_data
-        run: poetry run python src/data/fetch_data.py
+      - name: Pull data from DVC
+        run: poetry run dvc pull -r origin -f
+
+      - name: fetch_air_data
+        run: poetry run python src/models/train_model.py
 
       - name: Git global
         run: git config --global user.email "alen.gojkosek@student.um.si" && git config --global user.name "alengojkosek"
-        
-      - name: Git global
+
+      - name: dvc autostage
         run: poetry run dvc config core.autostage true
 
       - name: Commit data
         run: |
-            cd data/raw
-            poetry run dvc add raw_data.csv
-            git add raw_data.csv.dvc && git commit -m'Add new raw dataset'
-            
+          cd data/predictions
+          poetry run dvc add future_data.csv
+          git add future_data.csv.dvc && git commit -m'Add new future data predictions'
+
       - name: Push data dvc
         run: poetry run dvc push -r origin
 
@@ -57,3 +56,4 @@ jobs:
       - name: Get commit SHA and store it in GITHUB_OUTPUT
         id: sha_new
         run: echo "SHA_NEW=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+

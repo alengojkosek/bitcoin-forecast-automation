@@ -91,13 +91,13 @@ jobs:
         run: poetry run dvc pull -r origin -f
 
       - name: raw data to current_data
-        run: mv raw_data.csv current_data.csv
+        run: mv data/raw/raw_data.csv data/current_data.csv
 
       - name: Pull data from DVC
         run: poetry run dvc pull -r origin -f
 
       - name: raw data dvc to reference_data
-        run: mv raw_data.csv reference_data.csv
+        run: mv data/raw/raw_data.csv data/reference_data.csv
 
       - name: Git global
         run: git config --global user.email "alen.gojkosek@student.um.si" && git config --global user.name "alengojkosek"

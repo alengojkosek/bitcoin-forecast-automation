@@ -2,7 +2,7 @@ import pandas as pd
 from cryptocmd import CmcScraper
 
 # initialise scraper without time interval for max historical data
-scraper = CmcScraper("BTC")
+scraper = CmcScraper("ETH")
 
 df = scraper.get_dataframe()
 

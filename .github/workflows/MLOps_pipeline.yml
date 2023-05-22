@@ -166,7 +166,7 @@ jobs:
           publish-dir: "great_expectations/uncommitted/data_docs/local_site"
           production-deploy: true
         env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
 
   test_data:
@@ -203,7 +203,7 @@ jobs:
 
       - name: Run Evidently
         run: |
-          poetry run python src/data/evidently_file.py
+          poetry run python src/data/evidently.py
 
       - name: Git global
         run: git config --global user.email "alen.gojkosek@student.um.si" && git config --global user.name "alengojkosek"

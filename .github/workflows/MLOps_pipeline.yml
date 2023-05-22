@@ -43,8 +43,15 @@ jobs:
         run: |
           cd data/raw
           if ! git diff --quiet; then
-            poetry run dvc add raw_data.csv
-            git add raw_data.csv.dvc && git commit -m'Add new raw dataset'
+            if poetry run dvc add raw_data.csv; then
+              if git add raw_data.csv.dvc && git commit -m 'Add new raw dataset'; then
+                echo "Data committed successfully."
+              else
+                echo "Commit failed. Please check your Git configuration."
+              fi
+            else
+              echo "Failed to add file to DVC. Please check your DVC configuration."
+            fi
           else
             echo "Branch is up to date. Skipping commit."
           fi

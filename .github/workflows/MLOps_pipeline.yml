@@ -108,7 +108,6 @@ jobs:
 
       - name: Commit data
         run: |
-          cd data/
           if ! git diff --quiet; then
             poetry run dvc add data/current_data.csv data/reference_data.csv
             git add data/current_data.csv.dvc data/reference_data.csv.dvc .gitignore && git commit -m 'Add current and reference dataset'

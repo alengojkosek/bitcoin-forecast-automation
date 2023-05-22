@@ -1,4 +1,9 @@
 outs:
+<<<<<<< HEAD
 - md5: 96e7679d8c2f9571b1c2267330a920b8
   size: 380647
+=======
+- md5: ee2f8d0acd0bc2e2300de071c27d86ab
+  size: 383783
+>>>>>>> 384afa6240c80c3b50c41476352c1ad0cbe85131
   path: current_data.csv

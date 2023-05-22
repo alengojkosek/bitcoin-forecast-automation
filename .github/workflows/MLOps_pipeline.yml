@@ -107,15 +107,12 @@ jobs:
       - name: Git global
         run: git config --global user.email "alen.gojkosek@student.um.si" && git config --global user.name "alengojkosek"
       
-      - name: Git global
-        run: poetry run dvc config core.autostage true
-          
       - name: Commit data
         run: |
           cd data/
           if ! git diff --quiet; then
-            git add current_data.csv.dvc reference_data.csv.dvc .gitignore && git commit -m 'Add current and reference dataset'
             poetry run dvc add current_data.csv reference_data.csv
+            git add current_data.csv.dvc reference_data.csv.dvc .gitignore && git commit -m 'Add current and reference dataset'
           else
             echo "Branch is up to date. Skipping commit."
           fi

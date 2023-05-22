@@ -107,8 +107,9 @@ jobs:
 
       - name: Commit data
         run: |
-          git add data/current_data.csv.dvc data/reference_data.csv.dvc .gitignore && git commit -m 'Add current and reference dataset'
-          poetry run dvc add data/current_data.csv data/reference_data.csv
+          cd data/
+          poetry run dvc add current_data.csv reference_data.csv
+          git add current_data.csv.dvc reference_data.csv.dvc .gitignore && git commit -m 'Add current and reference dataset'
       - name: Push changes git
         uses: ad-m/github-push-action@master
         with:

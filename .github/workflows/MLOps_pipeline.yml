@@ -114,8 +114,8 @@ jobs:
         run: |
           cd data/
           if ! git diff --quiet; then
-            poetry run dvc add current_data.csv reference_data.csv
             git add current_data.csv.dvc reference_data.csv.dvc .gitignore && git commit -m 'Add current and reference dataset'
+            poetry run dvc add current_data.csv reference_data.csv
           else
             echo "Branch is up to date. Skipping commit."
           fi
@@ -220,8 +220,9 @@ jobs:
 
       - name: Commit data evidently
         run: |
-          poetry run dvc add report_e.json
-          git add report_e.json.dvc .gitignore && git commit -m'Add new evidently report'
+          cd ./src/reports/
+          poetry run dvc add report.html
+          git add report.html.dvc .gitignore && git commit -m'Add new evidently report'
 
       - name: Push changes git
         uses: ad-m/github-push-action@master

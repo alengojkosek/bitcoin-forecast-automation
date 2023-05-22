@@ -20,6 +20,8 @@ great-expectations = "^0.16.1"
 evidently = "^0.2.7"
 numpy = "1.23.5"
 mlflow = "^2.2.2"
+black = "^23.3.0"
+jupyter = "^1.0.0"
 
 [build-system]
 requires = ["poetry-core"]

@@ -125,9 +125,112 @@ jobs:
         id: sha_new
         run: echo "SHA_NEW=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
+
+  validate_data:
+    runs-on: ubuntu-latest
+    needs: create_reference_and_current_data
+    outputs:
+      sha_new: ${{steps.sha_new.outputs.SHA_NEW}}
+    permissions:
+      contents: write
+
+    strategy:
+      matrix:
+        python-version: [ "3.9" ]
+    steps:
+      - env:
+          SHA_NEW: ${{ needs.create_reference_and_current_data.outputs.sha_new }}
+        run: echo "$SHA_NEW"
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.create_reference_and_current_data.outputs.sha_new }}
+          fetch-depth: 0
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: poetry
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
+
+      - name: Pull data from DVC
+        run: poetry run dvc pull -r origin -f
+
+      - name: Run Checkpoint
+        run: |
+          poetry run python great_expectations/checkpoints/run_my_checkpoint.py
+
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v1.2
+        with:
+          publish-dir: "great_expectations/uncommitted/data_docs/local_site"
+          production-deploy: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+  test_data:
+    runs-on: ubuntu-latest
+    needs: validate_data
+    outputs:
+      sha_new: ${{steps.sha_new.outputs.SHA_NEW}}
+    permissions:
+      contents: write
+
+    strategy:
+      matrix:
+        python-version: [ "3.9" ]
+    steps:
+      - env:
+          SHA_NEW: ${{ needs.validate_data.outputs.sha_new }}
+        run: echo "$SHA_NEW"
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.validate_data.outputs.sha_new }}
+          fetch-depth: 0
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: poetry
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
+
+      - name: Pull data from DVC
+        run: poetry run dvc pull -r origin -f
+
+      - name: Run Evidently
+        run: |
+          poetry run python src/data/evidently_file.py
+
+      - name: Git global
+        run: git config --global user.email "alen.gojkosek@student.um.si" && git config --global user.name "alengojkosek"
+
+      - name: Commit data evidently
+        run: |
+          poetry run dvc add report_e.json
+          git add report_e.json.dvc .gitignore && git commit -m'Add new evidently report'
+
+      - name: Push changes git
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.TOKEN }}
+          branch: ${{ github.ref }}
+
+      - name: Push data dvc
+        run: poetry run dvc push -r origin
+
+      - name: Get commit SHA and store it in GITHUB_OUTPUT
+        id: sha_new
+        run: echo "SHA_NEW=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
   train_model:
     runs-on: ubuntu-latest
-    needs: fetch_btc_data
+    needs: test_data
 
     outputs:
       sha_new: ${{steps.sha_new.outputs.SHA_NEW}}
@@ -139,11 +242,11 @@ jobs:
         python-version: [ "3.9" ]
     steps:
       - env:
-          SHA_NEW: ${{ needs.fetch_btc_data.outputs.sha_new }}
+          SHA_NEW: ${{ needs.test_data.outputs.sha_new }}
         run: echo "$SHA_NEW"
       - uses: actions/checkout@v3
         with:
-          ref: ${{ needs.fetch_btc_data.outputs.sha_new }}
+          ref: ${{ needs.test_data.outputs.sha_new }}
           fetch-depth: 0
       - name: Install Poetry
         uses: snok/install-poetry@v1

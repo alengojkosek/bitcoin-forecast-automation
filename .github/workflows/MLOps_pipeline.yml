@@ -106,8 +106,8 @@ jobs:
         run: |
           cd data/
           if ! git diff --quiet; then
-            git add current_data.csv.dvc reference_data.csv.dvc .gitignore && git commit -m 'Add new current dataset'
-            poetry run dvc add current_data.csv reference_data.csv
+            poetry run dvc add data/current_data.csv data/reference_data.csv
+            git add data/current_data.csv.dvc data/reference_data.csv.dvc .gitignore && git commit -m 'Add current and reference dataset'
           else
             echo "Branch is up to date. Skipping commit."
           fi

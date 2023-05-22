@@ -210,7 +210,7 @@ jobs:
 
       - name: Run Evidently
         run: |
-          poetry run python src/data/evidently.py
+          poetry run python src/data/evidently_file.py
 
       - name: Git global
         run: git config --global user.email "alen.gojkosek@student.um.si" && git config --global user.name "alengojkosek"

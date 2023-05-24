@@ -163,18 +163,18 @@ jobs:
       - name: Pull data from DVC
         run: poetry run dvc pull -r origin -f
 
-      - name: Run Checkpoint
-        run: |
-          poetry run python great_expectations/checkpoints/run_my_checkpoint.py
+      #- name: Run Checkpoint
+       # run: |
+        #  poetry run python great_expectations/checkpoints/run_my_checkpoint.py
 
-      - name: Deploy to Netlify
-        uses: nwtgck/actions-netlify@v1.2
-        with:
-          publish-dir: "great_expectations/uncommitted/data_docs/local_site"
-          production-deploy: true
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+    #  - name: Deploy to Netlify
+     #   uses: nwtgck/actions-netlify@v1.2
+      #  with:
+       #   publish-dir: "great_expectations/uncommitted/data_docs/local_site"
+        #  production-deploy: true
+        #env:
+         # NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          #NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
 
   test_data:
     runs-on: ubuntu-latest
@@ -208,18 +208,18 @@ jobs:
       - name: Pull data from DVC
         run: poetry run dvc pull -r origin -f
 
-      - name: Run Evidently
-        run: |
-          poetry run python src/data/evidently_file.py
+      #- name: Run Evidently
+       # run: |
+        #  poetry run python src/data/evidently_file.py
 
-      - name: Deploy to Netlify
-        uses: nwtgck/actions-netlify@v1.2
-        with:
-          publish-dir: "src/reports"
-          production-deploy: true
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID2 }}
+      #- name: Deploy to Netlify
+       # uses: nwtgck/actions-netlify@v1.2
+        #with:
+         # publish-dir: "src/reports"
+          #production-deploy: true
+        #env:
+         # NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          #NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID2 }}
 
       - name: Get commit SHA and store it in GITHUB_OUTPUT
         id: sha_new

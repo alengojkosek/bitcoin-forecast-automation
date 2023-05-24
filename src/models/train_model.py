@@ -1,12 +1,17 @@
-from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
-from sklearn.model_selection import train_test_split
+
 import mlflow
 import os
 import pandas as pd
 import numpy as np
-from sklearn.linear_model import LinearRegression
 from datetime import timedelta, datetime
-
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dense, Dropout
+from tensorflow.keras.callbacks import EarlyStopping
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 MLFLOW_TRACKING_URI='https://dagshub.com/alengojkosek/bitcoin-forecast-automation.mlflow'
 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
@@ -25,53 +30,59 @@ mlflow.autolog(exclusive=False)
 with mlflow.start_run():
 
     df = pd.read_csv('data/raw/raw_data.csv')
+
     df['Date'] = pd.to_datetime(df['Date'])
 
-    # Get the last date from the DataFrame
-    last_date = df['Date'].max()
+    features = ['Date', 'Close']  # Only keeping Date and Close as features
+    data = df[features]
 
-    # Generate 7 future dates starting from the day after the last date
-    future_dates = pd.date_range(last_date + timedelta(days=1), periods=7, freq='D')
+    scaler = MinMaxScaler()
+    scaled_data = scaler.fit_transform(data['Close'].values.reshape(-1, 1))
 
-    # Create a new DataFrame with the future dates
-    future_df = pd.DataFrame({'Date': future_dates})
+    time_window = 10
 
-    # Convert the future dates to timestamps and predict the Close values using Linear Regression
-    X = df[['Date']].astype(np.int64) // 10**9
-    y = df['Close']
-    lr = LinearRegression().fit(X, y)
+    def create_sliding_window(data, window_size):
+        X = []
+        y = []
+        for i in range(len(data) - window_size):
+            X.append(data[i:i+window_size])
+            y.append(data[i+window_size])  # Appending the Close value
+        return np.array(X), np.array(y)
 
-    # Reshape the future dates array to a 2D array with a single feature
-    future_dates_2d = future_df['Date'].astype(np.int64) // 10**9
-    future_dates_2d = future_dates_2d.values.reshape(-1, 1)
+    X, y = create_sliding_window(scaled_data, time_window)
 
-    # Predict the Close values for the future dates
-    future_df['Close'] = lr.predict(future_dates_2d)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25, shuffle=False)
 
-    # Convert the predicted Close values back to floats
-    future_df['Close'] = future_df['Close'].astype(float)
+    model = Sequential()
+    model.add(LSTM(128, return_sequences=True, input_shape=(X_train.shape[1], X_train.shape[2])))
+    model.add(Dropout(0.2))
+    model.add(LSTM(64))
+    model.add(Dropout(0.2))
+    model.add(Dense(1))
 
-    # Save the future DataFrame to a new CSV file without the index column
-    future_df.to_csv('data/predictions/future_data.csv', index=False)
+    model.compile(loss='mean_squared_error', optimizer='adam')
 
-    # Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+    early_stopping = EarlyStopping(patience=3, restore_best_weights=True, monitor='loss')
 
-    # Fit a linear regression model to the training data
-    lr = LinearRegression().fit(X_train, y_train)
+    model.fit(X_train, y_train, epochs=20, batch_size=64, callbacks=[early_stopping], verbose=1)
 
-    # Predict the Close values for the test data
-    y_pred = lr.predict(X_test)
+    # Predict on the test set
+    y_pred = model.predict(X_test)
 
-    # Calculate the evaluation metrics
+    # Reverse scaling for the predicted and actual values
+    y_pred = scaler.inverse_transform(y_pred)
+    y_test = scaler.inverse_transform(y_test)
+
+    # Calculate the metrics
     mae = mean_absolute_error(y_test, y_pred)
     mse = mean_squared_error(y_test, y_pred)
     r2 = r2_score(y_test, y_pred)
 
+    # Print the metrics
     print("MAE:", mae)
     print("MSE:", mse)
     print("R2 Score:", r2)
-
 
     mlflow.log_metric("MAE", mae)
     mlflow.log_metric("MSE", mse)

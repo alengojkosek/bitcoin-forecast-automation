@@ -33,7 +33,7 @@ with mlflow.start_run():
 
     df['Date'] = pd.to_datetime(df['Date'])
 
-    features = ['Date', 'Close']  # Only keeping Date and Close as features
+    features = ['Date', 'Close'] 
     data = df[features]
 
     scaler = MinMaxScaler()
@@ -46,7 +46,7 @@ with mlflow.start_run():
         y = []
         for i in range(len(data) - window_size):
             X.append(data[i:i+window_size])
-            y.append(data[i+window_size])  # Appending the Close value
+            y.append(data[i+window_size])  
         return np.array(X), np.array(y)
 
     X, y = create_sliding_window(scaled_data, time_window)
@@ -67,22 +67,59 @@ with mlflow.start_run():
 
     model.fit(X_train, y_train, epochs=20, batch_size=64, callbacks=[early_stopping], verbose=1)
 
-    # Predict on the test set
     y_pred = model.predict(X_test)
 
-    # Reverse scaling for the predicted and actual values
     y_pred = scaler.inverse_transform(y_pred)
     y_test = scaler.inverse_transform(y_test)
 
-    # Calculate the metrics
     mae = mean_absolute_error(y_test, y_pred)
     mse = mean_squared_error(y_test, y_pred)
     r2 = r2_score(y_test, y_pred)
 
-    # Print the metrics
     print("MAE:", mae)
     print("MSE:", mse)
     print("R2 Score:", r2)
+
+    prediction_horizon = 7
+    last_date = df['Date'].iloc[0]  # Get the last date from your raw_data.csv
+    next_dates = pd.date_range(start=last_date, periods=prediction_horizon, closed='right')  # Generate the next 7 dates
+
+    # Scale the last known close price
+    last_close = data['Close'].iloc[0]
+    scaled_last_close = scaler.transform([[last_close]])
+
+    # Prepare the input sequence
+    input_sequence = np.zeros((prediction_horizon, time_window, 1))
+    input_sequence[0] = X[0]  # Last sequence from the test data
+
+    # Predict the next 7 days
+    predicted_prices = []
+
+    for i in range(1, prediction_horizon):
+        # Reshape the input sequence to match the model's input shape
+        input_seq = np.reshape(input_sequence[i-1], (1, input_sequence[i-1].shape[0], input_sequence[i-1].shape[1]))
+
+        # Predict the next time step
+        predicted_price = model.predict(input_seq)
+
+        # Append the predicted value to the input sequence
+        input_sequence[i] = np.concatenate([input_sequence[i-1, 1:], predicted_price])
+
+        # Reverse scaling for the predicted price
+        predicted_price = scaler.inverse_transform(predicted_price)
+
+        # Append the predicted price to the list of predictions
+        predicted_prices.append(predicted_price[0][0])
+
+    # Print the predicted prices with dates
+    for date, price in zip(next_dates, predicted_prices):
+        print(f"{date.date()}: {price}")
+
+    # Create a DataFrame with dates and predicted prices
+    future_data = pd.DataFrame({'Date': next_dates, 'Predicted_Price': predicted_prices})
+
+    # Save the DataFrame to CSV
+    future_data.to_csv('data/predictions/future_data.csv', index=False)
 
     mlflow.log_metric("MAE", mae)
     mlflow.log_metric("MSE", mse)

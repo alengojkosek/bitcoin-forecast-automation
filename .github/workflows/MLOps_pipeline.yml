@@ -258,7 +258,7 @@ jobs:
       - name: Pull data from DVC
         run: poetry run dvc pull -r origin -f
 
-      - name: fetch_air_data
+      - name: train model
         run: poetry run python src/models/train_model.py
 
       - name: Git global

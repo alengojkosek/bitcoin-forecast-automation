@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{include = "bitcoin_forecast_automation"}]
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.12"
+python = "3.11"
 pandas = "^2.0.1"
 cryptocmd = "^0.6.1"
 dvc = "^2.55.0"
@@ -24,8 +24,6 @@ jupyter = "^1.0.0"
 tensorflow-io-gcs-filesystem = "0.31.0"
 tensorflow = "2.11.0"
 great-expectations = "0.16.5"
-typing-extensions = "^4.6.1"
-sqlalchemy = "1.4.22"
 
 
 [build-system]

@@ -258,6 +258,9 @@ jobs:
       - name: Push data dvc
         run: poetry run dvc push -r origin
 
+      - name: Git pull
+        run: git pull origin main
+
       - name: Push changes git
         uses: ad-m/github-push-action@master
         with:

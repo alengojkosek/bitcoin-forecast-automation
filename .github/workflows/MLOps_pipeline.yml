@@ -227,7 +227,7 @@ jobs:
 
   train_model:
     runs-on: ubuntu-latest
-    needs: fetch_btc_data
+    needs: create_reference_and_current_data
 
     outputs:
       sha_new: ${{steps.sha_new.outputs.SHA_NEW}}
@@ -239,11 +239,11 @@ jobs:
         python-version: [ "3.9" ]
     steps:
       - env:
-          SHA_NEW: ${{ needs.fetch_btc_data.outputs.sha_new }}
+          SHA_NEW: ${{ needs.create_reference_and_current_data.outputs.sha_new }}
         run: echo "$SHA_NEW"
       - uses: actions/checkout@v3
         with:
-          ref: ${{ needs.fetch_btc_data.outputs.sha_new }}
+          ref: ${{ needs.create_reference_and_current_data.outputs.sha_new }}
           fetch-depth: 0
       - name: Install Poetry
         uses: snok/install-poetry@v1

@@ -84,6 +84,10 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
 
+      - name: workaround for detached HEAD
+        run: |
+          git checkout ${GITHUB_REF#refs/heads/}
+
       - name: Pull data from DVC
         run: poetry run dvc pull -r origin -f
 

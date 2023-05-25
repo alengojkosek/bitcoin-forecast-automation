@@ -97,11 +97,17 @@ with mlflow.start_run():
     print("MSE:", mse)
     print("R2 Score:", r2)
 
+<<<<<<< HEAD
     prediction_horizon = 8
     last_date = df["Date"].iloc[0]  # Get the last date from your raw_data.csv
     next_dates = pd.date_range(
         start=last_date, periods=prediction_horizon, closed="right"
     )  # Generate the next 7 dates
+=======
+    prediction_horizon = 7
+    last_date = df['Date'].iloc[0]  # Get the last date from your raw_data.csv
+    next_dates = pd.date_range(start=last_date, periods=prediction_horizon)  # Generate the next 7 dates
+>>>>>>> 46a0cc6d812eef96704dfd2d9a96bdb0947012bf
 
     # Scale the last known close price
     last_close = data["Close"].iloc[0]

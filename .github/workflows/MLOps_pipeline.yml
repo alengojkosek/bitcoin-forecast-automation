@@ -36,9 +36,6 @@ jobs:
       - name: Git global
         run: git config --global user.email "alen.gojkosek@student.um.si" && git config --global user.name "alengojkosek"
 
-      - name: Git global
-        run: poetry run dvc config core.autostage true
-
       - name: Commit data
         run: |
           cd data/raw
@@ -71,7 +68,7 @@ jobs:
         python-version: [ "3.9" ]
     steps:
       - env:
-          SHA_NEW: ${{ needs.fetch_btc_data.outputs.sha_new }}
+          sha_new: ${{ needs.fetch_btc_data.outputs.sha_new }}
         run: echo "$SHA_NEW"
       - uses: actions/checkout@v3
         with:
@@ -132,7 +129,7 @@ jobs:
         python-version: [ "3.9" ]
     steps:
       - env:
-          SHA_NEW: ${{ needs.create_reference_and_current_data.outputs.sha_new }}
+          sha_new: ${{ needs.create_reference_and_current_data.outputs.sha_new }}
         run: echo "$SHA_NEW"
       - uses: actions/checkout@v3
         with:
@@ -177,7 +174,7 @@ jobs:
         python-version: [ "3.9" ]
     steps:
       - env:
-          SHA_NEW: ${{ needs.validate_data.outputs.sha_new }}
+          sha_new: ${{ needs.validate_data.outputs.sha_new }}
         run: echo "$SHA_NEW"
       - uses: actions/checkout@v3
         with:
@@ -227,7 +224,7 @@ jobs:
         python-version: [ "3.9" ]
     steps:
       - env:
-          SHA_NEW: ${{ needs.test_data.outputs.sha_new }}
+          sha_new: ${{ needs.test_data.outputs.sha_new }}
         run: echo "$SHA_NEW"
       - uses: actions/checkout@v3
         with:
@@ -251,9 +248,6 @@ jobs:
 
       - name: Git global
         run: git config --global user.email "alen.gojkosek@student.um.si" && git config --global user.name "alengojkosek"
-
-      - name: dvc autostage
-        run: poetry run dvc config core.autostage true
 
       - name: Commit data
         run: |

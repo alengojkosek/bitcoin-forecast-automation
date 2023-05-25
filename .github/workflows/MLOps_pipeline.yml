@@ -38,12 +38,9 @@ jobs:
 
       - name: Commit data
         run: |
-          if ! git diff --quiet; then
-            poetry run dvc add current_data.csv reference_data.csv
-            git add current_data.csv.dvc reference_data.csv.dvc .gitignore && git commit -m 'Add current and reference dataset'
-          else
-            echo "Branch is up to date. Skipping commit."
-          fi
+          cd data/raw
+          poetry run dvc add raw_data.csv
+          git add raw_data.csv.dvc && git commit -m'Add new raw dataset'
 
       - name: Push data dvc
         run: poetry run dvc push -r origin
@@ -108,10 +105,12 @@ jobs:
       
       - name: Commit data
         run: |
-          cd data/
-          poetry run dvc add current_data.csv reference_data.csv
-          git add current_data.csv.dvc reference_data.csv.dvc .gitignore && git commit -m 'Add current and reference dataset'
-
+          if ! git diff --quiet; then
+            poetry run dvc add current_data.csv reference_data.csv
+            git add current_data.csv.dvc reference_data.csv.dvc .gitignore && git commit -m 'Add current and reference dataset'
+          else
+            echo "Branch is up to date. Skipping commit."
+          fi
       - name: Push changes git
         uses: ad-m/github-push-action@master
         with:

@@ -3,19 +3,17 @@ on:
   push:
 
 jobs:
-  mlflow:
+  train_model:
     runs-on: ubuntu-latest
     outputs:
       sha_new: ${{steps.sha_new.outputs.SHA_NEW}}
     permissions:
       contents: write
+
     strategy:
       matrix:
         python-version: [ "3.9" ]
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       - name: Install Poetry
         uses: snok/install-poetry@v1
       - name: Set up Python ${{ matrix.python-version }}
@@ -29,7 +27,7 @@ jobs:
       - name: Pull data from DVC
         run: poetry run dvc pull -r origin -f
 
-      - name: fetch_air_data
+      - name: train model
         run: poetry run python src/models/train_model.py
 
       - name: Git global
@@ -56,5 +54,3 @@ jobs:
       - name: Get commit SHA and store it in GITHUB_OUTPUT
         id: sha_new
         run: echo "SHA_NEW=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-
-test

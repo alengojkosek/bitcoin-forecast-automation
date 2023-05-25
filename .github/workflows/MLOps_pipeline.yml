@@ -87,15 +87,6 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
 
-      - name: workaround for detached HEAD
-        run: |
-          git checkout ${GITHUB_REF#refs/heads/}
-
-
-      - name: Pull data from DVC
-        run: poetry run dvc pull -r origin -f
-
-
       - name: Pull data from DVC
         run: poetry run dvc pull -r origin -f
 
@@ -111,12 +102,8 @@ jobs:
       - name: Commit data
         run: |
           cd data/
-          if ! git diff --quiet; then
-            poetry run dvc add current_data.csv reference_data.csv
-            git add current_data.csv.dvc reference_data.csv.dvc .gitignore && git commit -m 'Add current and reference dataset'
-          else
-            echo "Branch is up to date. Skipping commit."
-          fi
+          poetry run dvc add current_data.csv reference_data.csv
+          git add current_data.csv.dvc reference_data.csv.dvc .gitignore && git commit -m 'Add current and reference dataset'
 
       - name: Push changes git
         uses: ad-m/github-push-action@master

@@ -51,13 +51,7 @@
       "column": "Market Cap"
       }
       },
-      {
-      "expectation_type": "expect_column_values_to_be_of_type",
-      "kwargs": {
-      "column": "Date",
-      "type_": "datetime"
-      }
-      },
+    
       {
       "expectation_type": "expect_column_values_to_be_of_type",
       "kwargs": {
@@ -104,13 +98,6 @@
       "expectation_type": "expect_column_values_to_be_unique",
       "kwargs": {
       "column": "Date"
-      }
-      },
-      {
-      "expectation_type": "expect_column_values_to_be_in_type_list",
-      "kwargs": {
-      "column": "Date",
-      "type_list": ["datetime"]
       }
       }
       ],

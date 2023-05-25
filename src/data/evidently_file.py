@@ -13,4 +13,4 @@ report = Report(
 )
 
 report.run(reference_data=reference, current_data=current)
-report.save_html('./src/reports/file.html')
+report.save_html('./src/reports/index.html')

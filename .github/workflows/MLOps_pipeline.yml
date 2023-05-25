@@ -96,6 +96,9 @@ jobs:
       - name: Git global
         run: git config --global user.email "alen.gojkosek@student.um.si" && git config --global user.name "alengojkosek"
       
+      - name: dvc autostage
+        run: poetry run dvc config core.autostage true
+      
       - name: Commit data
         run: |
           cd data/
@@ -200,7 +203,7 @@ jobs:
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v1.2
         with:
-          publish-dir: "src/reports/file.html"
+          publish-dir: "src/reports/"
           production-deploy: true
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}

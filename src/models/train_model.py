@@ -98,24 +98,20 @@ with mlflow.start_run():
     print("R2 Score:", r2)
 
     prediction_horizon = 8
-    last_date = df["Date"].iloc[0]  # Get the last date from your raw_data.csv
+    last_date = df["Date"].iloc[0]
     next_dates = pd.date_range(
         start=last_date, periods=prediction_horizon
-    )  # Generate the next 7 dates
+    )
 
-    # Scale the last known close price
     last_close = data["Close"].iloc[0]
     scaled_last_close = scaler.transform([[last_close]])
 
-    # Prepare the input sequence
     input_sequence = np.zeros((prediction_horizon, time_window, 1))
-    input_sequence[0] = X[0]  # Last sequence from the test data
+    input_sequence[0] = X[0] 
 
-    # Predict the next 7 days
     predicted_prices = []
 
     for i in range(prediction_horizon):
-        if i > 0:
             input_seq = np.reshape(
                 input_sequence[i - 1],
                 (1, input_sequence[i - 1].shape[0], input_sequence[i - 1].shape[1]),

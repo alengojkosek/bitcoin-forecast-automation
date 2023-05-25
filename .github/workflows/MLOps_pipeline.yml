@@ -1,6 +1,6 @@
 name: MLOps Pipeline
 on:
-  workflow_dispatch:
+  push:
 
 jobs:
   fetch_btc_data:
@@ -95,14 +95,15 @@ jobs:
       - name: Pull data from DVC
         run: poetry run dvc pull -r origin -f
 
-      - name: raw data to current_data
-        run: mv data/raw/raw_data.csv data/current_data.csv
 
       - name: Pull data from DVC
         run: poetry run dvc pull -r origin -f
 
-      - name: raw data dvc to reference_data
-        run: mv data/raw/raw_data.csv data/reference_data.csv
+      - name: current data to reference_data
+        run: mv data/current_data.csv data/reference_data.csv
+
+      - name: raw data to current_data
+        run: mv data/raw/raw_data.csv data/current_data.csv
 
       - name: Git global
         run: git config --global user.email "alen.gojkosek@student.um.si" && git config --global user.name "alengojkosek"
@@ -215,7 +216,7 @@ jobs:
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v1.2
         with:
-          publish-dir: "src/reports"
+          publish-dir: "src/reports/file.html"
           production-deploy: true
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}

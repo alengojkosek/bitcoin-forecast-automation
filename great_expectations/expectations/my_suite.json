@@ -5,13 +5,115 @@
     {
       "expectation_type": "expect_table_row_count_to_be_between",
       "kwargs": {
-        "max_value": null,
-        "min_value": 1000
+      "min_value": 3000,
+      "max_value": 9000
+      }
       },
-      "meta": {}
-    }
-
-  ],
+      {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+      "column": "Date"
+      }
+      },
+      {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+      "column": "Open"
+      }
+      },
+      {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+      "column": "High"
+      }
+      },
+      {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+      "column": "Low"
+      }
+      },
+      {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+      "column": "Close"
+      }
+      },
+      {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+      "column": "Volume"
+      }
+      },
+      {
+      "expectation_type": "expect_column_to_exist",
+      "kwargs": {
+      "column": "Market Cap"
+      }
+      },
+      {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+      "column": "Date",
+      "type_": "datetime"
+      }
+      },
+      {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+      "column": "Open",
+      "type_": "float"
+      }
+      },
+      {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+      "column": "High",
+      "type_": "float"
+      }
+      },
+      {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+      "column": "Low",
+      "type_": "float"
+      }
+      },
+      {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+      "column": "Close",
+      "type_": "float"
+      }
+      },
+      {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+      "column": "Volume",
+      "type_": "float"
+      }
+      },
+      {
+      "expectation_type": "expect_column_values_to_be_of_type",
+      "kwargs": {
+      "column": "Market Cap",
+      "type_": "float"
+      }
+      },
+      {
+      "expectation_type": "expect_column_values_to_be_unique",
+      "kwargs": {
+      "column": "Date"
+      }
+      },
+      {
+      "expectation_type": "expect_column_values_to_be_in_type_list",
+      "kwargs": {
+      "column": "Date",
+      "type_list": ["datetime"]
+      }
+      }
+      ],
   "ge_cloud_id": null,
   "meta": {
     "citations": [

@@ -106,9 +106,12 @@ jobs:
       - name: Commit data
         run: |
           cd data/
-          poetry run dvc add .
-          git add .
+          poetry run dvc add current_data.csv
+          poetry run dvc add reference_data.csv
+          git add current_data.csv.dvc
+          git add reference_data.csv.dvc 
           git commit -m 'Add current and reference dataset'
+
       - name: Push changes git
         uses: ad-m/github-push-action@master
         with:
@@ -259,8 +262,8 @@ jobs:
       - name: Commit data
         run: |
           cd data/predictions
-          poetry run dvc add .
-          git add .  
+          poetry run dvc add future_data.csv
+          git add future_data.csv.dvc
           git commit -m'Add new future data predictions'
 
       - name: Push data dvc

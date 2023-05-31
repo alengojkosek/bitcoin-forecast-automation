@@ -74,7 +74,7 @@ with mlflow.start_run():
     model.fit(
             X_train,
             y_train,
-            epochs=1,
+            epochs=200,
             batch_size=64,
             callbacks=[early_stopping],
             verbose=1,

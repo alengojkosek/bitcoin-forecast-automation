@@ -1,0 +1,65 @@
+name: MLOps Pipeline
+on:
+  push:
+
+jobs:
+  fetch_btc_data:
+    runs-on: ubuntu-latest
+
+    outputs:
+      sha_new: ${{steps.sha_new.outputs.SHA_NEW}}
+
+    permissions:
+      contents: write
+
+    strategy:
+      matrix:
+        python-version: [ "3.9" ]
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: poetry
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
+
+      - name: workaround for detached HEAD
+        run: |
+          git checkout ${GITHUB_REF#refs/heads/}
+          git pull
+
+      - name: Pull data from DVC
+        run: poetry run dvc pull -r origin -f
+
+      - name: train model
+        run: poetry run python src/models/train_model.py
+
+      - name: Git global
+        run: git config --global user.email "alen.gojkosek@student.um.si" && git config --global user.name "alengojkosek"
+
+      - name: Commit data
+        run: |
+          cd data/predictions
+          poetry run dvc add future_data.csv
+          git add future_data.csv.dvc
+          git commit -m'Add new future data predictions'
+
+      - name: Push data dvc
+        run: poetry run dvc push -r origin
+
+      - name: Push changes git
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.TOKEN }}
+          branch: ${{ github.ref }}
+
+      - name: Get commit SHA and store it in GITHUB_OUTPUT
+        id: sha_new
+        run: echo "SHA_NEW=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"

@@ -92,7 +92,7 @@ with mlflow.start_run():
     print("MAE:", mae)
     print("MSE:", mse)
     print("R2 Score:", r2)
-
+    
     prediction_horizon = 8
     last_date = df['Date'].iloc[0]  # Get the last date from your raw_data.csv
     next_dates = pd.date_range(start=last_date, periods=prediction_horizon)  # Generate the next 7 dates
@@ -123,12 +123,33 @@ with mlflow.start_run():
         # Append the predicted price to the list of predictions
         predicted_prices.append(predicted_price[0][0])
 
-    future_data = pd.DataFrame(columns=["Date", "Price"])
-
+    # Print the predicted prices with dates
     for date, price in zip(next_dates, predicted_prices):
-        future_data = future_data.append({"Date": date.date(), "Price": price}, ignore_index=True)
+        print(f"{date.date()}: {price}")
 
-    print(future_data)
+    # Create a DataFrame with dates and predicted prices
+    data = {'Date': next_dates, 'Predicted_Price': predicted_prices}
+
+    # Determine the length of the arrays
+    num_dates = len(next_dates)
+    num_prices = len(predicted_prices)
+
+    # Check if the arrays have different lengths
+    if num_dates != num_prices:
+        min_length = min(num_dates, num_prices)
+
+        # Create DataFrame with matching lengths
+        data = {'Date': next_dates[:min_length], 'Predicted_Price': predicted_prices[:min_length]}
+
+        # Check if there are any remaining dates or prices
+        if num_dates > min_length:
+            data['Date'].extend(next_dates[min_length:])
+        elif num_prices > min_length:
+            data['Predicted_Price'].extend(predicted_prices[min_length:])
+
+    # Create the DataFrame
+    future_data = pd.DataFrame(data)
+
     # Save the DataFrame to CSV
     future_data.to_csv("data/predictions/future_data.csv", index=False)
 

@@ -54,16 +54,12 @@ with mlflow.start_run():
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, shuffle=False
     )
-    X_train, X_val, y_train, y_val = train_test_split(
-        X_train, y_train, test_size=0.25, shuffle=False
-    )
-
     model = Sequential()
     model.add(
-        LSTM(
-            128, return_sequences=True, input_shape=(X_train.shape[1], X_train.shape[2])
+            LSTM(
+                128, return_sequences=True, input_shape=(X_train.shape[1], X_train.shape[2])
+            )
         )
-    )
     model.add(Dropout(0.2))
     model.add(LSTM(64))
     model.add(Dropout(0.2))
@@ -72,17 +68,17 @@ with mlflow.start_run():
     model.compile(loss="mean_squared_error", optimizer="adam")
 
     early_stopping = EarlyStopping(
-        patience=3, restore_best_weights=True, monitor="loss"
-    )
+            patience=3, restore_best_weights=True, monitor="loss"
+        )
 
     model.fit(
-        X_train,
-        y_train,
-        epochs=20,
-        batch_size=64,
-        callbacks=[early_stopping],
-        verbose=1,
-    )
+            X_train,
+            y_train,
+            epochs=200,
+            batch_size=64,
+            callbacks=[early_stopping],
+            verbose=1,
+        )
 
     y_pred = model.predict(X_test)
 
@@ -96,50 +92,43 @@ with mlflow.start_run():
     print("MAE:", mae)
     print("MSE:", mse)
     print("R2 Score:", r2)
-
     prediction_horizon = 8
-    last_date = df["Date"].iloc[0]
-    next_dates = pd.date_range(
-        start=last_date, periods=prediction_horizon
-    )
+    last_date = df['Date'].iloc[0]  # Get the last date from your raw_data.csv
+    next_dates = pd.date_range(start=last_date, periods=prediction_horizon, closed='right')  # Generate the next 7 dates
 
-    last_close = data["Close"].iloc[0]
+    # Scale the last known close price
+    last_close = data['Close'].iloc[0]
     scaled_last_close = scaler.transform([[last_close]])
 
+    # Prepare the input sequence
     input_sequence = np.zeros((prediction_horizon, time_window, 1))
-    input_sequence[0] = X[0] 
+    input_sequence[0] = X[0]  # Last sequence from the test data
 
+    # Predict the next 7 days
     predicted_prices = []
 
     for i in range(prediction_horizon):
-            input_seq = np.reshape(
-                input_sequence[i - 1],
-                (1, input_sequence[i - 1].shape[0], input_sequence[i - 1].shape[1]),
-            )
+    if i > 0:
+        input_seq = np.reshape(input_sequence[i-1], (1, input_sequence[i-1].shape[0], input_sequence[i-1].shape[1]))
 
-            # Predict the next time step
-            predicted_price = model.predict(input_seq)
+        # Predict the next time step
+        predicted_price = model.predict(input_seq)
 
-            # Append the predicted value to the input sequence
-            input_sequence[i] = np.concatenate(
-                [input_sequence[i - 1, 1:], predicted_price]
-            )
+        # Append the predicted value to the input sequence
+        input_sequence[i] = np.concatenate([input_sequence[i-1, 1:], predicted_price])
 
-            # Reverse scaling for the predicted price
-            predicted_price = scaler.inverse_transform(predicted_price)
+        # Reverse scaling for the predicted price
+        predicted_price = scaler.inverse_transform(predicted_price)
 
-            # Append the predicted price to the list of predictions
-            predicted_prices.append(predicted_price[0][0])
+        # Append the predicted price to the list of predictions
+        predicted_prices.append(predicted_price[0][0])
 
     # Print the predicted prices with dates
     for date, price in zip(next_dates, predicted_prices):
         print(f"{date.date()}: {price}")
 
     # Create a DataFrame with dates and predicted prices
-    future_data = pd.DataFrame(
-        {"Date": next_dates, "Predicted_Price": predicted_prices}
-    )
-
+    future_data = pd.DataFrame({'Date': next_dates, 'Predicted_Price': predicted_prices})
     # Save the DataFrame to CSV
     future_data.to_csv("data/predictions/future_data.csv", index=False)
 

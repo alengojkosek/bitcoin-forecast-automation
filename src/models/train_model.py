@@ -108,20 +108,20 @@ with mlflow.start_run():
     predicted_prices = []
 
     for i in range(prediction_horizon):
-    if i > 0:
-        input_seq = np.reshape(input_sequence[i-1], (1, input_sequence[i-1].shape[0], input_sequence[i-1].shape[1]))
+        if i > 0:
+            input_seq = np.reshape(input_sequence[i-1], (1, input_sequence[i-1].shape[0], input_sequence[i-1].shape[1]))
 
-        # Predict the next time step
-        predicted_price = model.predict(input_seq)
+            # Predict the next time step
+            predicted_price = model.predict(input_seq)
 
-        # Append the predicted value to the input sequence
-        input_sequence[i] = np.concatenate([input_sequence[i-1, 1:], predicted_price])
+            # Append the predicted value to the input sequence
+            input_sequence[i] = np.concatenate([input_sequence[i-1, 1:], predicted_price])
 
-        # Reverse scaling for the predicted price
-        predicted_price = scaler.inverse_transform(predicted_price)
+            # Reverse scaling for the predicted price
+            predicted_price = scaler.inverse_transform(predicted_price)
 
-        # Append the predicted price to the list of predictions
-        predicted_prices.append(predicted_price[0][0])
+            # Append the predicted price to the list of predictions
+            predicted_prices.append(predicted_price[0][0])
 
     # Print the predicted prices with dates
     for date, price in zip(next_dates, predicted_prices):

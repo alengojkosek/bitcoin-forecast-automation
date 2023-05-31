@@ -74,7 +74,7 @@ with mlflow.start_run():
     model.fit(
             X_train,
             y_train,
-            epochs=200,
+            epochs=1,
             batch_size=64,
             callbacks=[early_stopping],
             verbose=1,
@@ -94,7 +94,7 @@ with mlflow.start_run():
     print("R2 Score:", r2)
     prediction_horizon = 8
     last_date = df['Date'].iloc[0]  # Get the last date from your raw_data.csv
-    next_dates = pd.date_range(start=last_date, periods=prediction_horizon, closed='right')  # Generate the next 7 dates
+    next_dates = pd.date_range(start=last_date, periods=prediction_horizon)  # Generate the next 7 dates
 
     # Scale the last known close price
     last_close = data['Close'].iloc[0]

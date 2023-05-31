@@ -142,9 +142,10 @@ with mlflow.start_run():
 
         # Check if there are any remaining dates or prices
         if num_dates > min_length:
-            data['Date'].extend(next_dates[min_length:])
+            data['Date'] += next_dates[min_length:]
         elif num_prices > min_length:
-            data['Predicted_Price'].extend(predicted_prices[min_length:])
+            data['Predicted_Price'] += predicted_prices[min_length:]
+
 
     # Create the DataFrame
     future_data = pd.DataFrame(data)

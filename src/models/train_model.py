@@ -124,33 +124,14 @@ with mlflow.start_run():
             # Append the predicted price to the list of predictions
             predicted_prices.append(predicted_price[0][0])
 
-    # Print the predicted prices with dates
-    for date, price in zip(next_dates, predicted_prices):
-        print(f"{date.date()}: {price}")
+            # Add the date and price to the DataFrame
+            predictions_df.loc[i] = [next_dates[i].date(), predicted_prices[i]]
 
+            # Print the predicted price with date
+            print(f"{next_dates[i].date()}: {predicted_prices[i]}")
 
-    # Determine the length of the arrays
-    num_dates = len(next_dates)
-    num_prices = len(predicted_prices)
-
-    # Check if the arrays have different lengths
-    if num_dates != num_prices:
-        min_length = min(num_dates, num_prices)
-
-        # Create DataFrame with matching lengths
-        data = {'Date': next_dates[:min_length], 'Predicted_Price': predicted_prices[:min_length]}
-
-        # Check if there are any remaining dates or prices
-        if num_dates > min_length:
-            data['Date'] += next_dates[min_length:]
-        elif num_prices > min_length:
-            data['Predicted_Price'] += predicted_prices[min_length:]
-
-
-    # Create the DataFrame
-    future_data = pd.DataFrame(data)
     # Save the DataFrame to CSV
-    future_data.to_csv("data/predictions/future_data.csv", index=False)
+    predictions_df.to_csv("data/predictions/future_data.csv", index=False)
 
     mlflow.log_metric("MAE", mae)
     mlflow.log_metric("MSE", mse)

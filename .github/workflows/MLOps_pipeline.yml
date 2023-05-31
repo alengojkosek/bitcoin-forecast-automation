@@ -1,6 +1,6 @@
 name: MLOps Pipeline
 on:
-  push:
+  workflow_dispatch:
 
 jobs:
   fetch_btc_data:

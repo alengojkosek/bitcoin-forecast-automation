@@ -124,11 +124,13 @@ with mlflow.start_run():
             # Append the predicted price to the list of predictions
             predicted_prices.append(predicted_price[0][0])
 
-            # Add the date and price to the DataFrame
-            predictions_df.loc[i] = [next_dates[i].date(), predicted_prices[i]]
 
-            # Print the predicted price with date
-            print(f"{next_dates[i].date()}: {predicted_prices[i]}")
+            # Print the predicted price with date if within the range
+            if i < len(next_dates) and i < len(predicted_prices):
+                print(f"{next_dates[i].date()}: {predicted_prices[i]}")
+
+    # Create a DataFrame with the predicted prices and dates
+    predictions_df = pd.DataFrame({'Date': next_dates[:len(predicted_prices)], 'Price': predicted_prices})
 
     # Save the DataFrame to CSV
     predictions_df.to_csv("data/predictions/future_data.csv", index=False)

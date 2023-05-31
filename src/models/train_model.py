@@ -95,7 +95,7 @@ with mlflow.start_run():
     
     prediction_horizon = 8
     last_date = df['Date'].iloc[0]  # Get the last date from your raw_data.csv
-    next_dates = pd.date_range(start=last_date, periods=prediction_horizon)  # Generate the next 7 dates
+    next_dates = pd.date_range(start=last_date, periods=prediction_horizon, closed='right')  # Generate the next 7 dates
 
     # Scale the last known close price
     last_close = data['Close'].iloc[0]
@@ -109,26 +109,25 @@ with mlflow.start_run():
     predicted_prices = []
 
     for i in range(prediction_horizon):
-        input_seq = np.reshape(input_sequence[i-1], (1, input_sequence[i-1].shape[0], input_sequence[i-1].shape[1]))
+        if i > 0:
+            input_seq = np.reshape(input_sequence[i-1], (1, input_sequence[i-1].shape[0], input_sequence[i-1].shape[1]))
 
-        # Predict the next time step
-        predicted_price = model.predict(input_seq)
+            # Predict the next time step
+            predicted_price = model.predict(input_seq)
 
-        # Append the predicted value to the input sequence
-        input_sequence[i] = np.concatenate([input_sequence[i-1, 1:], predicted_price])
+            # Append the predicted value to the input sequence
+            input_sequence[i] = np.concatenate([input_sequence[i-1, 1:], predicted_price])
 
-        # Reverse scaling for the predicted price
-        predicted_price = scaler.inverse_transform(predicted_price)
+            # Reverse scaling for the predicted price
+            predicted_price = scaler.inverse_transform(predicted_price)
 
-        # Append the predicted price to the list of predictions
-        predicted_prices.append(predicted_price[0][0])
+            # Append the predicted price to the list of predictions
+            predicted_prices.append(predicted_price[0][0])
 
     # Print the predicted prices with dates
     for date, price in zip(next_dates, predicted_prices):
         print(f"{date.date()}: {price}")
 
-    # Create a DataFrame with dates and predicted prices
-    data = {'Date': next_dates, 'Predicted_Price': predicted_prices}
 
     # Determine the length of the arrays
     num_dates = len(next_dates)
@@ -149,7 +148,6 @@ with mlflow.start_run():
 
     # Create the DataFrame
     future_data = pd.DataFrame(data)
-
     # Save the DataFrame to CSV
     future_data.to_csv("data/predictions/future_data.csv", index=False)
 

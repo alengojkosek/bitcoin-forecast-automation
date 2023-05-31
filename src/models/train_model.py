@@ -92,6 +92,7 @@ with mlflow.start_run():
     print("MAE:", mae)
     print("MSE:", mse)
     print("R2 Score:", r2)
+
     prediction_horizon = 8
     last_date = df['Date'].iloc[0]  # Get the last date from your raw_data.csv
     next_dates = pd.date_range(start=last_date, periods=prediction_horizon)  # Generate the next 7 dates
@@ -108,27 +109,26 @@ with mlflow.start_run():
     predicted_prices = []
 
     for i in range(prediction_horizon):
-        if i > 0:
-            input_seq = np.reshape(input_sequence[i-1], (1, input_sequence[i-1].shape[0], input_sequence[i-1].shape[1]))
+        input_seq = np.reshape(input_sequence[i-1], (1, input_sequence[i-1].shape[0], input_sequence[i-1].shape[1]))
 
-            # Predict the next time step
-            predicted_price = model.predict(input_seq)
+        # Predict the next time step
+        predicted_price = model.predict(input_seq)
 
-            # Append the predicted value to the input sequence
-            input_sequence[i] = np.concatenate([input_sequence[i-1, 1:], predicted_price])
+        # Append the predicted value to the input sequence
+        input_sequence[i] = np.concatenate([input_sequence[i-1, 1:], predicted_price])
 
-            # Reverse scaling for the predicted price
-            predicted_price = scaler.inverse_transform(predicted_price)
+        # Reverse scaling for the predicted price
+        predicted_price = scaler.inverse_transform(predicted_price)
 
-            # Append the predicted price to the list of predictions
-            predicted_prices.append(predicted_price[0][0])
+        # Append the predicted price to the list of predictions
+        predicted_prices.append(predicted_price[0][0])
 
-    # Print the predicted prices with dates
+    future_data = pd.DataFrame(columns=["Date", "Price"])
+
     for date, price in zip(next_dates, predicted_prices):
-        print(f"{date.date()}: {price}")
+        future_data = future_data.append({"Date": date.date(), "Price": price}, ignore_index=True)
 
-    # Create a DataFrame with dates and predicted prices
-    future_data = pd.DataFrame({'Date': next_dates, 'Predicted_Price': predicted_prices})
+    print(future_data)
     # Save the DataFrame to CSV
     future_data.to_csv("data/predictions/future_data.csv", index=False)
 

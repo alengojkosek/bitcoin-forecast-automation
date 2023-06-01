@@ -1,5 +1,5 @@
 ['remote "origin"']
     url = https://dagshub.com/alengojkosek/bitcoin-forecast-automation.dvc
-    auth = basic
-    user = alengojkosek
-    password = 517751f04dd3fed553ddf87bf19423c221b6d9ec
+    auth = basic 
+    user = alengojkosek 
+    password = af9dc140062b507e1c608237487e976c3d8e7d78

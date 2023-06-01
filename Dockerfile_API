@@ -1,13 +1,14 @@
-    FROM python:3.9-slim
+FROM python:3.9-slim
 
-    WORKDIR /app
+WORKDIR /app
 
-    COPY pyproject.toml poetry.lock /app/
+COPY pyproject.toml poetry.lock /app/
 
-    RUN pip install poetry && poetry install --no-root
+RUN pip install poetry && poetry install --no-root
 
-    COPY data src/serve/api.py .
+COPY data /app/data
+COPY src/serve/api.py /app/src/serve/api.py
 
-    EXPOSE 44933
+EXPOSE 44933
 
-    CMD ["poetry", "run", "dvc", "pull", "-r", "origin", "-f", "&&", "poetry", "run", "python", "src/serve/api.py"]
+CMD ["poetry", "run", "dvc", "pull", "-r", "origin", "-f", "&&", "poetry", "run", "python", "src/serve/api.py"]

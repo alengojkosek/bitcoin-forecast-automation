@@ -14,7 +14,7 @@ services:
   client:
     build:
       context: .
-      dockerfile: Dockerfile_Client
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     command: sh -c "cd src/client && npm start"
@@ -22,5 +22,5 @@ services:
       - bitcoin_network
       
 networks:
-  airpredict_network:
+  bitcoin_network:
     driver: bridge

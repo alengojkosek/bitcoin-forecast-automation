@@ -106,13 +106,13 @@ with mlflow.start_run():
     }
 
     # Create a DataFrame from the dictionary
-    df = pd.DataFrame(metrike)
+    df_metrike = pd.DataFrame(metrike)
 
     # Define the path to the CSV file
     csv_file = "data/metrics.csv"
 
     # Save the DataFrame to CSV
-    df.to_csv(csv_file, index=False)
+    df_metrike.to_csv(csv_file, index=False)
 
     print("Metrics saved to", csv_file)
 

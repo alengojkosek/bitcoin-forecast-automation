@@ -271,6 +271,14 @@ jobs:
           git add future_data.csv.dvc
           git commit -m'Add new future data predictions'
 
+      - name: Commit metrics
+        run: |
+          cd data
+          poetry run dvc add metrics.csv
+          git add metrics.csv.dvc
+          git commit -m'Add new metrics'
+
+
       - name: Push data dvc
         run: poetry run dvc push -r origin
 

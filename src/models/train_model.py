@@ -92,6 +92,30 @@ with mlflow.start_run():
     print("MAE:", mae)
     print("MSE:", mse)
     print("R2 Score:", r2)
+
+    import pandas as pd
+
+    mae = mean_absolute_error(y_test, y_pred)
+    mse = mean_squared_error(y_test, y_pred)
+    r2 = r2_score(y_test, y_pred)
+
+    # Create a dictionary to represent the data
+    metrike = {
+        "Metric": ["MAE", "MSE", "R2 Score"],
+        "Value": [mae, mse, r2]
+    }
+
+    # Create a DataFrame from the dictionary
+    df = pd.DataFrame(metrike)
+
+    # Define the path to the CSV file
+    csv_file = "data/metrics.csv"
+
+    # Save the DataFrame to CSV
+    df.to_csv(csv_file, index=False)
+
+    print("Metrics saved to", csv_file)
+
     
     prediction_horizon = 8
     last_date = df['Date'].iloc[0]  # Get the last date from your raw_data.csv

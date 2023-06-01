@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile_API
+    ports:
+      - "44933:44933"
+    command: sh -c "poetry run dvc pull -r origin -f && poetry run python src/serve/api.py"
+    networks:
+      - bitcoin_network
+
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile_Client
+    ports:
+      - "3000:3000"
+    command: sh -c "cd src/client && npm start"
+    networks:
+      - bitcoin_network
+      
+networks:
+  airpredict_network:
+    driver: bridge

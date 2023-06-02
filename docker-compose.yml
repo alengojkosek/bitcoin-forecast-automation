@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile_API
     ports:
       - "5000:5000"
-    command: ["poetry", "run", "python", "src/serve/api.py"]
+    command: sh -c "poetry run dvc pull -r origin -f && poetry run python src/serve/api.py"
     networks:
       - airpredict_network
 

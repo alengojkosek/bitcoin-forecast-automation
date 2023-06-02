@@ -140,7 +140,7 @@ const Home = (props) => {
           <span className="home-text25">{data[6] && data[6].Date}</span>
         </div>
         <div className="home-stat7">
-          <h1 className="home-text26">{metrics[0] && metrics[0].Metric + ':' + metrics[0] && metrics[0].Value}</h1>
+          <h1 className="home-text26">MAE: {metrics[0] && metrics[0].Value}</h1>
           <span className="home-text27">LSTM model</span>
         </div>
       </div>

@@ -37,6 +37,8 @@ def metrics():
     data_path = os.path.join(os.getcwd(), 'data', 'metrics.csv')
     if os.path.exists(data_path):
         df = pd.read_csv(data_path)
+        df['Value'] = df['Value'].astype(int)
+
         return jsonify(df.to_dict(orient='records'))
     else:
         return jsonify({'error': 'Data file not found'})

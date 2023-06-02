@@ -6,10 +6,21 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+
 @app.route('/predict', methods=['GET'])
 def predict():
     file_path = os.path.join('data', 'predictions', 'future_data.csv')
     df = pd.read_csv(file_path)
+
+    # Round the "Price" column to 1 decimal place
+    df['Price'] = df['Price'].astype(int)
+
+    # Convert the "Date" column to datetime
+    df['Date'] = pd.to_datetime(df['Date'])
+
+    # Change the date format to "dd/mm/yyyy"
+    df['Date'] = df['Date'].dt.strftime('%d/%m/%Y')
+
     return jsonify(df.to_dict(orient='records'))
 
 @app.route('/current')
@@ -31,4 +42,4 @@ def metrics():
         return jsonify({'error': 'Data file not found'})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0',debug=True, port=5000)

@@ -6,10 +6,10 @@ services:
       context: .
       dockerfile: Dockerfile_API
     ports:
-      - "44933:44933"
-    command: sh -c "poetry run dvc pull -r origin -f && poetry run python src/serve/api.py"
+      - "5000:5000"
+    command: ["poetry", "run", "python", "src/serve/api.py"]
     networks:
-      - bitcoin_network
+      - airpredict_network
 
   client:
     build:
@@ -17,10 +17,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    command: sh -c "cd src/client && npm start"
+    command: npm start
     networks:
-      - bitcoin_network
+      - airpredict_network
       
 networks:
-  bitcoin_network:
+  airpredict_network:
     driver: bridge

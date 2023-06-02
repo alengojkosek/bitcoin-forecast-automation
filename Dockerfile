@@ -1,12 +1,5 @@
-FROM node:14-alpine
-
-WORKDIR /app
-
-COPY src/client/package.json src/client/package-lock.json /app/
+FROM  node:14-alpine
+COPY src/client .
 RUN npm install
-
-COPY src/client /app/src/client
-
 EXPOSE 3000
-
-CMD ["sh", "-c", "cd src/client && npm start"]
+CMD ["npm", "start"]

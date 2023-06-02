@@ -9,6 +9,6 @@ RUN pip install poetry && poetry install --no-root
 COPY data /app/data
 COPY src/serve/api.py /app/src/serve/api.py
 
-EXPOSE 44933
+EXPOSE 5000
 
 CMD ["poetry", "run", "dvc", "pull", "-r", "origin", "-f", "&&", "poetry", "run", "python", "src/serve/api.py"]

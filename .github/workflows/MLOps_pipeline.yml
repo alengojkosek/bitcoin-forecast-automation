@@ -278,7 +278,6 @@ jobs:
           git add metrics.csv.dvc
           git commit -m'Add new metrics'
 
-
       - name: Push data dvc
         run: poetry run dvc push -r origin
 
@@ -291,3 +290,28 @@ jobs:
       - name: Get commit SHA and store it in GITHUB_OUTPUT
         id: sha_new
         run: echo "SHA_NEW=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  # Okteto_deployment:
+  #   runs-on: ubuntu-latest
+  #   needs: train_model
+  #   steps:
+  #     - name: checkout
+  #       uses: actions/checkout@master
+
+  #     - name: Context
+  #       uses: okteto/context@latest
+  #       with:
+  #         token: ${{ secrets.OKTETO_TOKEN }}
+
+  #     - name: Create namespace
+  #       uses: okteto/create-namespace@latest
+  #       with:
+  #         namespace: pr-${{ github.event.number }}-alengojkosek
+    
+  #     - name: Deploy preview environment
+  #       uses: okteto/deploy-preview@latest
+  #       with:
+  #         scope: global
+  #         name: pr-${{ github.event.number }}-alengojkosek
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
